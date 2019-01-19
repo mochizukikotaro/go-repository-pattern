@@ -28,6 +28,8 @@ type UserResponse struct {
 }
 
 func FindAll(w http.ResponseWriter, r *http.Request) {
+	dump, _ := httputil.DumpRequest(r, true)
+	fmt.Println(string(dump))
 	userRepository := repository.NewUserRepository(db.Db())
 	users := userRepository.FindAll()
 	res, _ := json.Marshal(UsersResponse{http.StatusOK, users})
@@ -39,14 +41,9 @@ func FindByID(w http.ResponseWriter, r *http.Request) {
 	dump, _ := httputil.DumpRequest(r, true)
 	fmt.Println(string(dump))
 	ID := strings.Replace(r.URL.Path, "/user/", "", 1)
-	fmt.Printf("ID: %v\n", ID)
-	db := db.Db()
-	defer db.Close()
-	var u model.User
-	selectQuery := `select * from users where id = ?`
-	row := db.QueryRow(selectQuery, ID)
-	row.Scan(&u.ID, &u.Name)
-	fmt.Printf("n: %v\n", u)
+	userRepository := repository.NewUserRepository(db.Db())
+	u := userRepository.FindByID(ID)
+
 	// TODO: 失敗しているときは 200 以外を返したいです。
 	res, _ := json.Marshal(UserResponse{http.StatusOK, u})
 	w.Header().Set("Content-Type", "application/json")

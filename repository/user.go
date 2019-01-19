@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	FindAll() []model.User
-	FindByID() model.User
+	FindByID(ID string) model.User
 }
 
 type userRepository struct {
@@ -39,6 +39,13 @@ func (userRepository *userRepository) FindAll() []model.User {
 	return users
 }
 
-func (userRepository *userRepository) FindByID() model.User {
-
+func (userRepository *userRepository) FindByID(ID string) model.User {
+	db := userRepository.DB
+	defer db.Close()
+	var u model.User
+	selectQuery := `select * from users where id = ?`
+	row := db.QueryRow(selectQuery, ID)
+	row.Scan(&u.ID, &u.Name)
+	fmt.Printf("n: %v\n", u)
+	return u
 }
