@@ -11,5 +11,6 @@ import (
 func main() {
 	http.HandleFunc("/users", handler.FindAll)
 	http.HandleFunc("/user/", handler.FindByID)
+	http.HandleFunc("/notes", handler.NoteFindAll)
 	http.ListenAndServe(":8080", nil)
 }

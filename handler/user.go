@@ -2,14 +2,12 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"strings"
 
 	"github.com/mochizukikotaro/go-repository-pattern/db"
-	"github.com/mochizukikotaro/go-repository-pattern/repository"
 	"github.com/mochizukikotaro/go-repository-pattern/model"
+	"github.com/mochizukikotaro/go-repository-pattern/repository"
 )
 
 type UsersResponse struct {
@@ -23,8 +21,6 @@ type UserResponse struct {
 }
 
 func FindAll(w http.ResponseWriter, r *http.Request) {
-	dump, _ := httputil.DumpRequest(r, true)
-	fmt.Println(string(dump))
 	userRepository := repository.NewUserRepository(db.Db())
 	users := userRepository.FindAll()
 	res, _ := json.Marshal(UsersResponse{http.StatusOK, users})
@@ -33,8 +29,6 @@ func FindAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func FindByID(w http.ResponseWriter, r *http.Request) {
-	dump, _ := httputil.DumpRequest(r, true)
-	fmt.Println(string(dump))
 	ID := strings.Replace(r.URL.Path, "/user/", "", 1)
 	userRepository := repository.NewUserRepository(db.Db())
 	u := userRepository.FindByID(ID)
