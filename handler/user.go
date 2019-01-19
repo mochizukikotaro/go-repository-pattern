@@ -12,11 +12,6 @@ import (
 	"github.com/mochizukikotaro/go-repository-pattern/model"
 )
 
-type Ping struct {
-	Status int
-	Result string
-}
-
 type UsersResponse struct {
 	Status int
 	Result []model.User
