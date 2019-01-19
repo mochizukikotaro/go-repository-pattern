@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/mochizukikotaro/go-repository-pattern/db"
+	"github.com/mochizukikotaro/go-repository-pattern/repository"
+	"github.com/mochizukikotaro/go-repository-pattern/model"
 )
 
 type Ping struct {
@@ -15,36 +17,19 @@ type Ping struct {
 	Result string
 }
 
-type User struct {
-	ID   int
-	Name string
-}
-
 type UsersResponse struct {
 	Status int
-	Result []User
+	Result []model.User
 }
 
 type UserResponse struct {
 	Status int
-	Result User
+	Result model.User
 }
 
 func FindAll(w http.ResponseWriter, r *http.Request) {
-	db := db.Db()
-	defer db.Close()
-	q := `select * from users`
-	rows, err := db.Query(q)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer rows.Close()
-	users := []User{}
-	u := User{}
-	for rows.Next() {
-		_ = rows.Scan(&u.ID, &u.Name)
-		users = append(users, u)
-	}
+	userRepository := repository.NewUserRepository(db.Db())
+	users := userRepository.FindAll()
 	res, _ := json.Marshal(UsersResponse{http.StatusOK, users})
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(res)
@@ -57,7 +42,7 @@ func FindByID(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("ID: %v\n", ID)
 	db := db.Db()
 	defer db.Close()
-	var u User
+	var u model.User
 	selectQuery := `select * from users where id = ?`
 	row := db.QueryRow(selectQuery, ID)
 	row.Scan(&u.ID, &u.Name)
